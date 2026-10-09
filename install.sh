@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # Installs into user-owned directories; no sudo or system Python modifications.
-repo="KotdaPK/granite-folder-transcriber"
-install_root="${GRANITE_INSTALL_ROOT:-$HOME/.local/share/granite-transcriber}"
-bin_dir="${GRANITE_BIN_DIR:-$HOME/.local/bin}"
+repo="KotdaPK/talk-journal"
+install_root="${TALK_JOURNAL_INSTALL_ROOT:-$HOME/.local/share/talk-journal}"
+bin_dir="${TALK_JOURNAL_BIN_DIR:-$HOME/.local/bin}"
 
 for command in curl tar; do
     command -v "$command" >/dev/null || { printf 'Missing required command: %s\n' "$command" >&2; exit 1; }
@@ -31,16 +31,16 @@ python="$install_root/venv/bin/python"
 scratch="$(mktemp -d)"
 trap 'rm -rf "$scratch"' EXIT
 mkdir -p "$scratch/source"
-if [ -n "${GRANITE_SOURCE_DIR:-}" ]; then
-    cp -a "$GRANITE_SOURCE_DIR/." "$scratch/source/"
+if [ -n "${TALK_JOURNAL_SOURCE_DIR:-}" ]; then
+    cp -a "$TALK_JOURNAL_SOURCE_DIR/." "$scratch/source/"
 else
     curl -fsSL "https://github.com/$repo/archive/refs/heads/main.tar.gz" | tar -xz -C "$scratch/source" --strip-components=1
 fi
 "$uv_bin" pip install --python "$python" "$scratch/source"
 "$uv_bin" pip check --python "$python"
-ln -sfn "$install_root/venv/bin/granite-transcribe" "$bin_dir/granite-transcribe"
+ln -sfn "$install_root/venv/bin/talk-journal" "$bin_dir/talk-journal"
 
-printf 'Installed: %s/granite-transcribe\n' "$bin_dir"
+printf 'Installed: %s/talk-journal\n' "$bin_dir"
 if [[ ":$PATH:" != *":$bin_dir:"* ]]; then
     printf 'Add %s to PATH (e.g. export PATH="%s:$PATH") or use its full path.\n' "$bin_dir" "$bin_dir"
 fi
