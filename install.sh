@@ -21,10 +21,12 @@ fi
 
 "$uv_bin" python install 3.12
 mkdir -p "$install_root" "$bin_dir"
-"$uv_bin" venv --python 3.12 "$install_root/venv"
+if [ ! -x "$install_root/venv/bin/python" ]; then
+    "$uv_bin" venv --python 3.12 "$install_root/venv"
+fi
 python="$install_root/venv/bin/python"
 # Avoid pulling gigabytes of CUDA wheels on machines using CPU inference.
-"$uv_bin" pip install --python "$python" 'torch==2.14.1+cpu' --index https://download.pytorch.org/whl/cpu
+"$uv_bin" pip install --python "$python" 'torch==2.14.1+cpu' 'torchaudio==2.11.0+cpu' --index https://download.pytorch.org/whl/cpu
 
 scratch="$(mktemp -d)"
 trap 'rm -rf "$scratch"' EXIT
