@@ -6,6 +6,7 @@ build/
 dist/
 recordings/
 transcripts/
+raw-text/
 *.wav
 *.mp3
 *.m4a
