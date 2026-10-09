@@ -5,21 +5,26 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "talk-journal"
 version = "0.1.0"
-description = "Local speech-to-text for files and folders using IBM Granite Speech and Silero VAD"
+description = "Local modular GPU speech transcription with Parakeet Ultra"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 dependencies = [
     "torch>=2.11,<2.15",
     "torchaudio>=2.11,<2.15",
-    "transformers>=4.52.1,<5",
-    "accelerate>=1,<2",
-    "silero-vad>=6,<7",
-    "soundfile>=0.13,<1",
+    "moondream==2.6.1",
+    "deepfilternet==0.5.6",
+    "soundfile>=0.12,<0.13",
+    "scipy>=1.11,<2",
     "imageio-ffmpeg>=0.6,<1",
 ]
 
+[project.optional-dependencies]
+granite = ["transformers>=4.52.1,<5", "accelerate>=1,<2", "silero-vad>=6,<7", "torchcodec>=0.7"]
+moss = ["moss-transcribe-diarize @ git+https://github.com/OpenMOSS/MOSS-Transcribe-Diarize.git@61bc29cd4120be7b5d3b761b64cd5dff57263642"]
+
 [project.scripts]
-talk-journal = "transcribe_folder:main"
+talk-journal = "talk_journal.cli:main"
 
 [tool.setuptools]
 py-modules = ["transcribe_folder"]
+packages = ["talk_journal", "talk_journal.backends", "talk_journal.preprocessing"]

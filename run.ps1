@@ -2,7 +2,7 @@
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$command = Join-Path $PSScriptRoot '.venv\Scripts\talk-journal.exe'
+$command = Join-Path $PSScriptRoot '.venv-default\Scripts\talk-journal.exe'
 if (-not (Test-Path -LiteralPath $command -PathType Leaf)) {
     throw 'Talk Journal is not installed. Run .\install.ps1 first.'
 }

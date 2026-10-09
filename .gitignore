@@ -1,4 +1,6 @@
 .venv/
+.venv-default/
+.venv-moss/
 __pycache__/
 *.py[cod]
 *.egg-info/

@@ -1,0 +1,1 @@
+"""Local modular speech transcription."""
