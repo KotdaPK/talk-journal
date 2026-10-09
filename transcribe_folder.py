@@ -263,16 +263,20 @@ def atomic_write(path: Path, text: str):
 
 
 def load_models():
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    if not torch.cuda.is_available():
+        raise RuntimeError(
+            "CUDA is unavailable. Install a CUDA-enabled PyTorch build and an NVIDIA driver; "
+            "Talk Journal will not silently transcribe on the CPU."
+        )
+    device = "cuda"
     print(f"\nDevice: {device}")
-    if device == "cuda":
-        print(f"GPU: {torch.cuda.get_device_name(0)}")
+    print(f"GPU: {torch.cuda.get_device_name(0)}")
     print(f"Loading {MODEL_NAME}...")
     processor = AutoProcessor.from_pretrained(MODEL_NAME)
     model = AutoModelForSpeechSeq2Seq.from_pretrained(
         MODEL_NAME,
         device_map=device,
-        dtype=torch.bfloat16 if device == "cuda" else torch.float32,
+        dtype=torch.bfloat16,
     )
     print("Loading Silero VAD...")
     vad_model = load_silero_vad()

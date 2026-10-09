@@ -26,13 +26,15 @@ if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
     if ($LASTEXITCODE -ne 0) { throw 'Could not create the virtual environment.' }
 }
 
-# Explicit CPU wheels avoid downloading CUDA packages on ordinary Windows PCs.
-& $uv pip install --python $python 'torch==2.14.1+cpu' 'torchaudio==2.11.0+cpu' --index 'https://download.pytorch.org/whl/cpu'
-if ($LASTEXITCODE -ne 0) { throw 'Could not install CPU PyTorch.' }
+# Install matched CUDA wheels; never fall back to a CPU-only PyTorch build.
+& $uv pip install --python $python 'torch==2.11.0+cu128' 'torchaudio==2.11.0+cu128' --index 'https://download.pytorch.org/whl/cu128'
+if ($LASTEXITCODE -ne 0) { throw 'Could not install CUDA PyTorch.' }
 & $uv pip install --python $python $PSScriptRoot
 if ($LASTEXITCODE -ne 0) { throw 'Could not install Talk Journal.' }
 & $uv pip check --python $python
 if ($LASTEXITCODE -ne 0) { throw 'Installed packages are incompatible.' }
+& $python -c 'import torch,sys;print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else None);sys.exit(0 if torch.cuda.is_available() else 1)'
+if ($LASTEXITCODE -ne 0) { throw 'CUDA is unavailable. Talk Journal requires a working NVIDIA GPU and driver.' }
 
 Write-Host 'Talk Journal installed. Transcribing recordings/ into raw-text/...'
 & (Join-Path $PSScriptRoot 'run.ps1')

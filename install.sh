@@ -25,8 +25,8 @@ if [ ! -x "$install_root/venv/bin/python" ]; then
     "$uv_bin" venv --python 3.12 "$install_root/venv"
 fi
 python="$install_root/venv/bin/python"
-# Avoid pulling gigabytes of CUDA wheels on machines using CPU inference.
-"$uv_bin" pip install --python "$python" 'torch==2.14.1+cpu' 'torchaudio==2.11.0+cpu' --index https://download.pytorch.org/whl/cpu
+# Matched CUDA wheels; transcriptions must not silently run on the CPU.
+"$uv_bin" pip install --python "$python" 'torch==2.11.0+cu128' 'torchaudio==2.11.0+cu128' --index https://download.pytorch.org/whl/cu128
 
 scratch="$(mktemp -d)"
 trap 'rm -rf "$scratch"' EXIT
@@ -38,6 +38,7 @@ else
 fi
 "$uv_bin" pip install --python "$python" "$scratch/source"
 "$uv_bin" pip check --python "$python"
+"$python" -c 'import torch,sys; print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else None); sys.exit(0 if torch.cuda.is_available() else 1)'
 ln -sfn "$install_root/venv/bin/talk-journal" "$bin_dir/talk-journal"
 
 printf 'Installed: %s/talk-journal\n' "$bin_dir"

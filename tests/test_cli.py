@@ -9,6 +9,27 @@ import transcribe_folder as cli
 
 
 class CliTests(unittest.TestCase):
+    def test_cuda_unavailable_fails_before_loading_models(self):
+        with patch.object(cli.torch.cuda, "is_available", return_value=False), patch.object(
+            cli.AutoProcessor, "from_pretrained"
+        ) as processor:
+            with self.assertRaisesRegex(RuntimeError, "CUDA"):
+                cli.load_models()
+            processor.assert_not_called()
+
+    def test_granite_is_loaded_on_cuda_with_bfloat16(self):
+        with patch.object(cli.torch.cuda, "is_available", return_value=True), patch.object(
+            cli.torch.cuda, "get_device_name", return_value="NVIDIA test GPU"
+        ), patch.object(cli.AutoProcessor, "from_pretrained") as processor, patch.object(
+            cli.AutoModelForSpeechSeq2Seq, "from_pretrained"
+        ) as model, patch.object(cli, "load_silero_vad"):
+            _, _, _, device = cli.load_models()
+        self.assertEqual(device, "cuda")
+        model.assert_called_once_with(
+            cli.MODEL_NAME, device_map="cuda", dtype=cli.torch.bfloat16
+        )
+        processor.assert_called_once_with(cli.MODEL_NAME)
+
     def test_single_file_default_output_beside_source(self):
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / "a.m4a"
