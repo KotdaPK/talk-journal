@@ -48,6 +48,87 @@ Each source gets distinct results under `OUTPUT_ROOT/<relative/full.filename>/<m
 
 Legacy root-level `.txt` transcripts are left untouched and never relabeled as Parakeet. Migrating them requires deliberate manual inspection; the new structured outputs are separate. Recording and generated transcript directories remain Git-ignored. Word timing precision exists only when the backend supplies it; Granite and MOSS expose segment timing, not invented word timestamps. Exit code is nonzero for failed jobs; a bad file does not block later files in a batch. One recording is decoded at a time. An empty transcript is a failure, not a completed recording: short/quiet audio can lose intelligibility under DeepFilterNet3; compare `--preprocess none` and inspect the original instead of trusting an empty result. Genuine silence also needs explicit review.
 
+## Offline editorial handoff (synthetic acceptance boundary)
+
+The existing CLI can consume a reviewed, externally authored JSON editorial packet.
+It does not call Codex, embed Hermes, infer prose, or download anything. An authorized
+native Codex session reads the source and current full pages, writes a dossier and
+complete replacement pages, and hands that packet to this deterministic consumer.
+The `author` field is a declaration, not cryptographic proof of a provider response.
+Tests' small inline packets are fixtures, not captured responses. The two packets
+in `tests/fixtures/editorial/` were authored by the native
+`openai-codex/gpt-6.1-sol-900k` engineering session from the accompanying fictional
+conversations; their prose, attribution and uncertainty are editorial work, while
+hashing, provenance footers, indexing and diff rendering are deterministic formatting.
+No real conversation, provider trace or private vault is included.
+
+From this checkout, using the already installed environment:
+
+```bash
+python -m talk_journal.cli editorial tests/fixtures/editorial/source-1.txt tests/fixtures/editorial/packet-1.json /your/private/scratch/wiki-1
+# Exact replay prints NOOP and changes no files or timestamps:
+python -m talk_journal.cli editorial tests/fixtures/editorial/source-1.txt tests/fixtures/editorial/packet-1.json /your/private/scratch/wiki-1
+# Overlapping new source creates a separate complete snapshot; wiki-1 is untouched:
+python -m talk_journal.cli editorial tests/fixtures/editorial/source-2.txt tests/fixtures/editorial/packet-2.json /your/private/scratch/wiki-2 --base /your/private/scratch/wiki-1
+```
+
+`talk-journal editorial ...` is the equivalent installed entry point after publication
+and normal installation; merely editing this checkout does not update installations.
+For a media directory literally named `editorial`, use `./editorial` with the original
+transcription command. No manifest dependency or original transcription output format
+has changed. The text handoff records exact transcript byte identity; ASR identity,
+speaker identity and timing not supplied by that text are not invented. Keep the
+original transcript JSON/completion metadata alongside the original text when needed.
+
+Packet schema version 1 has exactly these fields (see the executable examples):
+
+- `source_sha256`: SHA-256 of the exact UTF-8 transcript bytes.
+- `author`: `openai-codex/gpt-6.1-sol-900k` declaration.
+- `dossier`: attributed editorial narrative, not an extraction template.
+- `uncertainty`: nonempty list of unresolved claims, or an explicit reviewable statement
+  that none was identified. The consumer cannot verify that judgement.
+- `quotes`: nonempty verbatim source quotations supporting the edits. Presence is
+  checked, but entailment, completeness and correct speaker interpretation need review.
+- `pages`: nonempty edits with `path`, `before_sha256`, and complete `markdown`.
+  The before-image is the hash of the entire rendered previous page, including its
+  provenance footer; use null only for a new page. Retain relevant earlier meaning,
+  attribution and uncertainty when writing the replacement; overlap is editorial,
+  not a keyword merge. Unedited pages are carried forward unchanged.
+
+Paths are lowercase ASCII basenames such as `rooftop-trial.md`; `index.md` and
+`review.md` are reserved. Supported authored Markdown is deliberately narrow: ordinary
+text, headings, lists and `[label](existing-page.md)` links to included pages.
+HTML, embeds/images, external/reference/wiki links, frontmatter, backslashes and
+control characters are refused. Dossier/uncertainty/quotes are plain text without
+links. This conservative subset may reject legitimate source quotations; choose a
+safe verbatim excerpt or stop for review, never alter the raw source to satisfy it.
+
+Open `index.md` to find pages, follow each page's dossiers to immutable source text,
+and open `review.md` for the current dossier, uncertainty, complete before/after pages
+and unified diffs. Prior snapshots retain their previous review. New snapshots carry
+all historical dossiers and source bytes, and each edited page links every contributing
+source. Same transcript bytes plus the same packet are a no-op; a different packet
+for an already consumed source is a conflict, not silent re-ingestion. This content
+identity intentionally deduplicates identical bytes under different filenames, not
+paraphrases. No automatic semantic duplicate detector is claimed.
+
+Destinations must be task-owned private scratch, never a live vault. Updates require
+a new destination plus `--base`; there is no in-place apply or automatic vault sync.
+The base must have an intact completion manifest and exact tracked artifact inventory;
+changed pages, symlinks, unexpected files, unsafe paths and stale before-images fail
+closed. A completion manifest is written last. An interrupted write can leave an
+incomplete destination, which is not a valid base; preserve it for diagnosis and use
+a fresh path. Single-writer ownership is required: filesystem races, concurrent
+hostile writers and authenticated provenance are not solved by these hashes.
+
+Before accepting ingestion, review full pages plus diffs against all contributing
+sources: fidelity, attribution, unresolved facts, contradictions, bounded approvals,
+and retrieval/navigation. The fictional overlap example deliberately preserves an
+unsettled budget/currency and weather condition while updating Bo's approval; it
+does not turn a greenhouse into approved scope. Unit and scratch CLI checks prove
+source/synthetic behavior only. Ordinary Obsidian opening/navigation, private-data
+permission and human source-fidelity acceptance remain separate and unperformed.
+
 ## Requirements and limitations
 
 Parakeet Ultra/Photon requires NVIDIA CUDA and supports long encoded recordings with internal pause-aware segmentation. DeepFilterNet3 is a 48 kHz mono enhancement model; version 0.5.6 uses Python 3.11 wheels (Linux and Windows), so the default environment is Python 3.11. DeepFilterNet 0.5.6 imports a torchaudio API removed in 2.11; this application supplies a narrow in-process `df.io` adapter for already-decoded WAV files using `soundfile` rather than modifying installed vendor code. MOSS native long-form on a 12 GB RTX 4080 Laptop GPU is **not established** by its published 90-minute context; processing time, true 30–45 minute VRAM behavior, and accurate coverage must be measured on the target recording. In case of OOM/incomplete native output the chunk fallback limits context and speaker identity to each chunk; inspect metadata. For long/problematic audio, use Parakeet as default. Granite remains available with its historical prompts/VAD when its extra has been installed.
