@@ -11,6 +11,10 @@ from talk_journal.pipeline import process
 
 
 def main(argv: list[str] | None = None) -> int:
+    arguments = argv if argv is not None else sys.argv[1:]
+    if arguments and arguments[0] == "editorial":
+        from talk_journal.editorial import main as editorial_main
+        return editorial_main(arguments[1:])
     parser = argparse.ArgumentParser(description="Local, GPU-only speech transcription")
     parser.add_argument("input_path", type=Path, nargs="?", help="Media file or directory")
     parser.add_argument("output_dir", type=Path, nargs="?", help="Output root")

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "source_sha256": "1b5f54da5e2da967e0b800d6fb768e050e45978b6013b44b67f558c996b507b0",
+  "author": "openai-codex/gpt-6.1-sol-900k",
+  "dossier": "Bo now approves the small rooftop herb trial for Saturday only if weather permits. Ada explicitly identifies this as replacing the earlier tentative Saturday idea, while saying the budget and its currency remain unsettled. Bo excludes a greenhouse from the approval and says bad weather would postpone the trial without a replacement date. This updates the earlier lack of approval; it does not retroactively turn that earlier proposal into a commitment.",
+  "uncertainty": [
+    "Saturday is conditional on weather, and no calendar date or weather forecast is supplied.",
+    "The budget and currency remain unresolved; the earlier tentative forty is not confirmed here.",
+    "There is no replacement date if weather requires postponement."
+  ],
+  "quotes": [
+    "Bo: I approve the small herb trial for Saturday, provided the weather permits.",
+    "Ada: That replaces the tentative Saturday idea. We still have not settled the budget or its currency.",
+    "Bo: This does not approve a greenhouse. Bad weather means we postpone; there is no replacement date yet."
+  ],
+  "pages": [
+    {
+      "path": "rooftop-trial.md",
+      "before_sha256": "783f77aaea8d411ebc8d50991db45323133af94485011195896dd63a7103a576",
+      "markdown": "# Rooftop herb trial\n\nAda initially proposed a small rooftop herb trial, not a greenhouse, while Bo had not approved it. In the later conversation Bo approves that small trial for Saturday if weather permits. Ada says this replaces the earlier tentative Saturday idea.\n\n## Open questions\n\nThe budget and currency remain unsettled. Ada previously mentioned a tentative forty, but the later conversation does not confirm that amount. No calendar date is provided. Bad weather means postponement, with no replacement date yet.\n\nSee [trial decisions](trial-decisions.md) for the bounded approval.\n"
+    },
+    {
+      "path": "trial-decisions.md",
+      "before_sha256": "026bb4f8b3bddfd0b00c15d7f9b3a9f84af7ef61282fcd8e7b590dd70706c282",
+      "markdown": "# Trial decisions\n\nBo initially withheld approval. In the later conversation Bo approves a small herb trial for Saturday, conditional on weather. This supersedes the earlier unapproved state for the trial only; Bo explicitly does not approve a greenhouse.\n\nNo settled budget, known currency, calendar date or fallback date is established. See [rooftop herb trial](rooftop-trial.md).\n"
+    }
+  ]
+}

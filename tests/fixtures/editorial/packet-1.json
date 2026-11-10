@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "source_sha256": "e81b70e20c623084b03dd6eb1e1fffcdfd1c20afc0f870ea9f929cb214d528d9",
+  "author": "openai-codex/gpt-6.1-sol-900k",
+  "dossier": "Ada proposes a small rooftop herb trial and explicitly excludes a greenhouse project. Bo says the trial is not yet approved. Ada mentions a possible Saturday and a tentative amount of forty, without remembering the currency. Neither the date nor the budget is settled in this conversation.",
+  "uncertainty": [
+    "Bo has not approved the trial; a proposal is not an accepted commitment.",
+    "Saturday is a possibility, not a confirmed date; no calendar date is supplied.",
+    "The amount forty is tentative and its currency is unknown."
+  ],
+  "quotes": [
+    "Ada: I would like a small rooftop herb trial, not a greenhouse project.",
+    "Bo: I have not approved the trial yet.",
+    "Ada: The budget might be forty, but I cannot remember the currency. Saturday is only a possibility."
+  ],
+  "pages": [
+    {
+      "path": "rooftop-trial.md",
+      "before_sha256": null,
+      "markdown": "# Rooftop herb trial\n\nAda proposes a small rooftop herb trial, not a greenhouse. Bo has not approved it.\n\n## Open questions\n\nSaturday is only a possibility. Ada mentions a tentative forty, but the currency is unknown; do not treat this as a settled budget.\n\nSee [trial decisions](trial-decisions.md) for the approval state.\n"
+    },
+    {
+      "path": "trial-decisions.md",
+      "before_sha256": null,
+      "markdown": "# Trial decisions\n\nNo approval is established: Bo explicitly says the trial is not approved yet. Ada's proposed scope is a small herb trial only.\n\nTiming and budget remain open. See [rooftop herb trial](rooftop-trial.md).\n"
+    }
+  ]
+}
